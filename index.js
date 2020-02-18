@@ -74,7 +74,7 @@ RpioButton.prototype = {
         this.log.debug(`Set button PIN: ${this.pin} to ${state}`);
         this.state = state;
         rpio.write(this.pin, state === Characteristic.LockTargetState.UNSECURED ? rpio.HIGH : rpio.LOW);
-        if (state && !this.preventTurnOff) {
+        if (state === Characteristic.LockTargetState.UNSECURED && !this.preventTurnOff) {
             setTimeout(() => {
                 rpio.write(this.pin, rpio.LOW);
                 this.service.setCharacteristic(Characteristic.LockTargetState, Characteristic.LockTargetState.SECURED);

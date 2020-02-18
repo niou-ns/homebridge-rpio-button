@@ -67,7 +67,7 @@ RpioButton.prototype = {
         callback(null, this.state);
     },
     getLockTargetState: function(callback) {
-        this.log.debug(`Button PIN: ${this.pin} target state ${this.state === Characteristic.LockTargetState.SECURED ? 'HIGH' : 'LOW'}`);
+        this.log.debug(`Button PIN: ${this.pin} is ${this.state === Characteristic.LockTargetState.SECURED ? 'HIGH' : 'LOW'}`);
         callback(null, this.state);
     },
     setLockTargetState: function(state, callback) {

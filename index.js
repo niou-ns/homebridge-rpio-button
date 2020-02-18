@@ -1,8 +1,9 @@
 const rpio = require('rpio');
+let Service, Characteristic;
 
 module.exports = (homebridge) => {
-    global.Service = homebridge.hap.Service;
-    global.Characteristic = homebridge.hap.Characteristic;
+    Service = homebridge.hap.Service;
+    Characteristic = homebridge.hap.Characteristic;
     homebridge.registerAccessory("homebridge-rpio-button", "RpioButton", RpioButton);
 };
 
@@ -28,16 +29,17 @@ function RpioButton(log, config) {
         .setCharacteristic(Characteristic.Manufacturer, 'Raspberry');
 
 
-    this.services.push(this.service, this.serviceInfo);
+    this.services.push(this.service);
+    this.services.push(this.serviceInfo);
 }
 
 
 RpioButton.prototype = {
-    getOn: (callback) => {
+    getOn: function(callback) {
         this.log.debug(`Button PIN: ${this.pin} is ${this.state}`);
         callback(null, this.state);
     },
-    setOn: (state, callback) => {
+    setOn: function(state, callback) {
         this.log.debug(`Set button PIN: ${this.pin} to ${state}`);
         this.state = state;
         rpio.write(this.pin, state ? rpio.HIGH : rpio.LOW);
@@ -48,5 +50,7 @@ RpioButton.prototype = {
         }
         callback(null);
     },
-    getServices: () => this.services
+    getServices: function() {
+        return this.services
+    }
 };

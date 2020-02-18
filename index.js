@@ -1,9 +1,8 @@
 const rpio = require('rpio');
-let Service, Characteristic;
 
 module.exports = (homebridge) => {
-    Service = homebridge.hap.Service;
-    Characteristic = homebridge.hap.Characteristic;
+    global.Service = homebridge.hap.Service;
+    global.Characteristic = homebridge.hap.Characteristic;
     homebridge.registerAccessory("homebridge-rpio-button", "RpioButton", RpioButton);
 };
 
@@ -20,6 +19,10 @@ function RpioButton(log, config) {
     rpio.open(this.pin, rpio.OUTPUT);
     this.log(`Created button: ${this.name} on pin: ${this.pin}`);
 
+    this.serviceInfo = new Service.AccessoryInformation();
+    this.serviceInfo
+        .setCharacteristic(Characteristic.Manufacturer, 'Raspberry');
+
     if (this.type == 'lock') {
         this.state = Characteristic.LockCurrentState.SECURED;
         this.service = new Service.LockMechanism(this.name);
@@ -28,17 +31,18 @@ function RpioButton(log, config) {
         this.service.getCharacteristic(Characteristic.LockTargetState)
             .on('get', this.getLockTargetState.bind(this))
             .on('set', this.setLockTargetState.bind(this));
+
+        this.serviceInfo
+            .setCharacteristic(Characteristic.Model, 'Door Locker');
     } else {
         this.service = new Service.Switch(this.name);
         this.service.getCharacteristic(Characteristic.On)
             .on('get', this.getOn.bind(this))
             .on('set', this.setOn.bind(this));
+
+        this.serviceInfo
+            .setCharacteristic(Characteristic.Model, 'GPIO Button');
     }
-
-    this.serviceInfo = new Service.AccessoryInformation();
-    this.serviceInfo
-        .setCharacteristic(Characteristic.Manufacturer, 'Raspberry');
-
 
     this.services.push(this.service);
     this.services.push(this.serviceInfo);
@@ -64,24 +68,20 @@ RpioButton.prototype = {
     },
     getLockCurrentState: function(callback) {
         this.log.debug(`Button PIN: ${this.pin} is ${this.state === Characteristic.LockCurrentState.UNSECURED ? 'HIGH' : 'LOW'}`);
-        console.log('Pin 15 is currently ' + (rpio.read(this.pin) ? 'high' : 'low'))
         callback(null, this.state);
     },
     getLockTargetState: function(callback) {
         this.log.debug(`Button PIN: ${this.pin} is ${this.state === Characteristic.LockTargetState.UNSECURED ? 'HIGH' : 'LOW'}`);
-        console.log('Pin 15 is currently ' + (rpio.read(this.pin) ? 'high' : 'low'))
         callback(null, this.state);
     },
     setLockTargetState: function(state, callback) {
         this.log.debug(`Set button PIN: ${this.pin} to ${state === Characteristic.LockTargetState.UNSECURED ? 'HIGH' : 'LOW'}`);
         this.state = state;
         rpio.write(this.pin, state === Characteristic.LockTargetState.UNSECURED ? rpio.HIGH : rpio.LOW);
-        console.log('Pin 15 is currently ' + (rpio.read(this.pin) ? 'high' : 'low'));
         if (state === Characteristic.LockTargetState.UNSECURED && !this.preventTurnOff) {
             setTimeout(() => {
                 rpio.write(this.pin, rpio.LOW);
                 this.service.setCharacteristic(Characteristic.LockTargetState, Characteristic.LockTargetState.SECURED);
-                console.log('Pin 15 is currently ' + (rpio.read(this.pin) ? 'high' : 'low'));
             }, this.timeout);
         }
         callback(null);

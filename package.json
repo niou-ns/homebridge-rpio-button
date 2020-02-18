@@ -17,7 +17,7 @@
     "button"
   ],
   "dependencies": {
-    "rpio": "^6.13.4"
+    "rpio": "^2.1.1"
   },
   "engines": {
     "homebridge": ">=0.2.0",

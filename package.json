@@ -1,6 +1,6 @@
 {
   "name": "homebridge-rpio-button",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple plugin to create fake buttons to call GPIO.",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,7 @@
   },
   "keywords": [
     "homebridge",
+    "homebridge-plugin",
     "rpio",
     "gpio",
     "button"

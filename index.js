@@ -13,16 +13,26 @@ function RpioButton(log, config) {
     this.pin = config.pin ? config.pin : 15; // GPIO 22
     this.state = false;
     this.preventTurnOff = config.preventTurnOff ? config.preventTurnOff : false;
-    this.timeout = config.timeout ? config.timeout : 100;
+    this.timeout = config.timeout ? config.timeout : 500;
     this.services = [];
 
     rpio.open(this.pin, rpio.OUTPUT);
     this.log(`Created button: ${this.name} on pin: ${this.pin}`);
 
-    this.service = new Service.Switch(this.name);
-    this.service.getCharacteristic(Characteristic.On)
-        .on('get', this.getOn.bind(this))
-        .on('set', this.setOn.bind(this));
+    if (this.type == 'lock') {
+        this.state = Characteristic.LockCurrentState.SECURED;
+        this.service = new Service.LockMechanism(this.name);
+        this.service.getCharacteristic(Characteristic.LockCurrentState)
+            .on('get', this.getLockCurrentState.bind(this));
+        this.service.getCharacteristic(Characteristic.LockTargetState)
+            .on('get', this.getLockTargetState.bind(this))
+            .on('set', this.setLockTargetState.bind(this));
+    } else {
+        this.service = new Service.Switch(this.name);
+        this.service.getCharacteristic(Characteristic.On)
+            .on('get', this.getOn.bind(this))
+            .on('set', this.setOn.bind(this));
+    }
 
     this.serviceInfo = new Service.AccessoryInformation();
     this.serviceInfo
@@ -45,7 +55,28 @@ RpioButton.prototype = {
         rpio.write(this.pin, state ? rpio.HIGH : rpio.LOW);
         if (state && !this.preventTurnOff) {
             setTimeout(() => {
+                rpio.write(this.pin, rpio.LOW);
                 this.service.setCharacteristic(Characteristic.On, false);
+            }, this.timeout);
+        }
+        callback(null);
+    },
+    getLockCurrentState: function(callback) {
+        this.log.debug(`Button PIN: ${this.pin} is ${this.state}`);
+        callback(null, thiis.state);
+    },
+    getLockTargetState: function(callback) {
+        this.log.debug(`Button PIN: ${this.pin} target state ${this.state}`);
+        callback(null, this.state);
+    },
+    setLockTargetState: function(state, callback) {
+        this.log.debug(`Set button PIN: ${this.pin} to ${state}`);
+        this.state = state;
+        rpio.write(this.pin, state === Characteristic.LockTargetState.UNSECURED ? rpio.HIGH : rpio.LOW);
+        if (state && !this.preventTurnOff) {
+            setTimeout(() => {
+                rpio.write(this.pin, rpio.LOW);
+                this.service.setCharacteristic(Characteristic.LockTargetState, Characteristic.LockTargetState.SECURED);
             }, this.timeout);
         }
         callback(null);

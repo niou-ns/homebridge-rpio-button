@@ -63,21 +63,22 @@ RpioButton.prototype = {
         callback(null);
     },
     getLockCurrentState: function(callback) {
-        this.log.debug(`Button PIN: ${this.pin} is ${this.state === Characteristic.LockTargetState.SECURED ? 'HIGH' : 'LOW'}`);
+        this.log.debug(`Button PIN: ${this.pin} is ${this.state === Characteristic.LockCurrentState.SECURED ? 'HIGH' : 'LOW'}`);
         callback(null, this.state);
     },
     getLockTargetState: function(callback) {
-        this.log.debug(`Button PIN: ${this.pin} is ${this.state === Characteristic.LockTargetState.SECURED ? 'HIGH' : 'LOW'}`);
+        this.log.debug(`Button PIN: ${this.pin} is ${this.state === Characteristic.LockTargetState.UNSECURED ? 'HIGH' : 'LOW'}`);
         callback(null, this.state);
     },
     setLockTargetState: function(state, callback) {
-        this.log.debug(`Set button PIN: ${this.pin} to ${state === Characteristic.LockTargetState.SECURED ? 'HIGH' : 'LOW'}`);
+        this.log.debug(`Set button PIN: ${this.pin} to ${state === Characteristic.LockTargetState.UNSECURED ? 'HIGH' : 'LOW'}`);
         this.state = state;
         rpio.write(this.pin, state === Characteristic.LockTargetState.UNSECURED ? rpio.HIGH : rpio.LOW);
         if (state === Characteristic.LockTargetState.UNSECURED && !this.preventTurnOff) {
             setTimeout(() => {
                 rpio.write(this.pin, rpio.LOW);
                 this.service.setCharacteristic(Characteristic.LockTargetState, Characteristic.LockTargetState.SECURED);
+                console.log('Pin 15 is currently ' + (rpio.read(this.pin) ? 'high' : 'low'));
             }, this.timeout);
         }
         callback(null);

@@ -14,6 +14,7 @@ function RpioButton(log, config) {
     this.state = false;
     this.preventTurnOff = config.preventTurnOff ? config.preventTurnOff : false;
     this.timeout = config.timeout ? config.timeout : 500;
+    this.type = config.type ? config.type : false;
     this.services = [];
 
     rpio.open(this.pin, rpio.OUTPUT);

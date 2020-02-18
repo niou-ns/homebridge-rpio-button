@@ -11,7 +11,7 @@ function RpioButton(log, config) {
     this.log = log;
     this.name = config.name ? config.name : 'Rpio Button';
     this.pin = config.pin ? config.pin : 15; // GPIO 22
-    this.state = 0;
+    this.state = false;
     this.preventTurnOff = config.preventTurnOff ? config.preventTurnOff : false;
     this.timeout = config.timeout ? config.timeout : 100;
     this.services = [];

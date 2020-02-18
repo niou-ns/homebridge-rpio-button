@@ -1,0 +1,32 @@
+{
+  "name": "homebridge-rpio-button",
+  "version": "1.0.0",
+  "description": "Simple plugin to create fake buttons to call GPIO.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niou-ns/homebridge-rpio-button.git"
+  },
+  "keywords": [
+    "homebridge",
+    "rpio",
+    "gpio",
+    "button"
+  ],
+  "dependencies": {
+    "rpio": "^6.13.4"
+  },
+  "engines": {
+    "homebridge": ">=0.2.0",
+    "node": ">=0.12.0"
+  },
+  "author": "Krzysztof Pintscher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/niou-ns/homebridge-rpio-button/issues"
+  },
+  "homepage": "https://github.com/niou-ns/homebridge-rpio-button#readme"
+}

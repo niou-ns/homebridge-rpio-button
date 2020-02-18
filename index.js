@@ -64,7 +64,7 @@ RpioButton.prototype = {
     },
     getLockCurrentState: function(callback) {
         this.log.debug(`Button PIN: ${this.pin} is ${this.state}`);
-        callback(null, thiis.state);
+        callback(null, this.state);
     },
     getLockTargetState: function(callback) {
         this.log.debug(`Button PIN: ${this.pin} target state ${this.state}`);
